@@ -25,11 +25,10 @@ namespace TechJobsPersistent.Controllers
         public IActionResult Index()
         {
             List<Job> jobs = context.Jobs.Include(j => j.Employer).ToList();
-
-            return View(jobs);
+            List<Job> orderedJobs = jobs.OrderBy(o => o.Name).ToList();
+            return View(orderedJobs);
         }
 
-        [HttpGet]
         public IActionResult AddJob()
         {
             List<Employer> employers = context.Employers.ToList();
@@ -38,45 +37,33 @@ namespace TechJobsPersistent.Controllers
             return View(addJobViewModel);
         }
 
-        [HttpPost, Route("/AddJob")]
-        public IActionResult ProcessAddJobForm(AddJobViewModel addJobViewModel, String[] selectedSkills)
+        [HttpPost, Route("Home/AddJob")]
+        public IActionResult ProcessAddJobForm(AddJobViewModel addJobViewModel, string[] selectedSkills)
         {
-            int jobId = addJobViewModel.JobId;
-
-
             if (ModelState.IsValid)
             {
-                Employer theEmployer = context.Employers.Find(addJobViewModel.EmployerId);
                 Job newJob = new Job
                 {
                     Name = addJobViewModel.Name,
-
-                    Employer = theEmployer
+                    EmployerId = addJobViewModel.EmployerId,
                 };
                 context.Jobs.Add(newJob);
                 context.SaveChanges();
 
-                List<JobSkill> existingJobs = context.JobSkills
-                    .Where(js => js.JobId == jobId)
-                    .ToList();
-
-                if (existingJobs.Count == 0)
+                foreach (string skill in selectedSkills)
                 {
-                    for (int i = 0; i < selectedSkills.Length; i++)
+                    JobSkill newJobSkill = new JobSkill
                     {
-                        JobSkill newJobSkill = new JobSkill
-                        {
-                            JobId = newJob.Id,
-                            SkillId = int.Parse(selectedSkills[i])
-                        };
-                        context.JobSkills.Add(newJobSkill);
-                    }
+                        JobId = newJob.Id,
+
+                        SkillId = int.Parse(skill)
+                    };
+                    context.JobSkills.Add(newJobSkill);
                 }
-
                 context.SaveChanges();
-                return Redirect("/List");
-            }
 
+                return Redirect("/Home");
+            }
             return View("AddJob", addJobViewModel);
         }
 

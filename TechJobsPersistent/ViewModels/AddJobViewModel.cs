@@ -9,34 +9,30 @@ using TechJobsPersistent.Models;
 
 namespace TechJobsPersistent.ViewModels
 {
-    public class AddJobViewModel 
+    public class AddJobViewModel
     {
-        public int JobId { get; set; }
-        public int EmployerId { get; set; }
-
-        [Required(ErrorMessage = "Job name is required.")]
+        [Required(ErrorMessage = "Job name is required")]
         public string Name { get; set; }
-
+        [Required(ErrorMessage = "Employer name is required")]
+        public int EmployerId { get; set; }
         public List<SelectListItem> Employers { get; set; }
+        public List<int> SkillId { get; set; }
         public List<Skill> Skills { get; set; }
 
-        public AddJobViewModel(List<Employer> employers, List<Skill> selectedSkills)
+        public AddJobViewModel(List<Employer> employers, List<Skill> skills)
         {
-            Skills = new List<Skill>();
-            foreach (var skill in selectedSkills)
-            {
-                Skills.Add(skill);
-            }
-
             Employers = new List<SelectListItem>();
-            foreach (var employer in employers)
+            Skills = skills;
+
+            foreach (Employer employer in employers)
             {
                 Employers.Add(
                     new SelectListItem
                     {
                         Value = employer.Id.ToString(),
                         Text = employer.Name
-                    });
+                    }
+                );
             }
         }
 
