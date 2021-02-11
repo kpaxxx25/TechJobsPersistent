@@ -40,8 +40,6 @@ namespace TechJobsPersistent.Controllers
         [HttpPost, Route("Home/AddJob")]
         public IActionResult ProcessAddJobForm(AddJobViewModel addJobViewModel, string[] selectedSkills)
         {
-            addJobViewModel = new AddJobViewModel(context.Employers.ToList(), context.Skills.ToList());
-
             if (ModelState.IsValid)
             {
                 Job newJob = new Job
@@ -65,6 +63,7 @@ namespace TechJobsPersistent.Controllers
 
                 return Redirect("/Home");
             }
+            addJobViewModel = new AddJobViewModel(context.Employers.ToList(), context.Skills.ToList());
             return View("AddJob", addJobViewModel);
         }
 
